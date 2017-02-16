@@ -69,6 +69,27 @@ class TableRow extends Component {
     }
   }
 
+  rowDragStart = e => {
+    const rowIndex = this.props.index;
+    if (this.props.onRowDragStart) {
+      this.props.onRowDragStart(rowIndex, e);
+    }
+  }
+
+  rowDragEnd = e => {
+    const rowIndex = this.props.index;
+    if (this.props.onRowDragEnd) {
+      this.props.onRowDragEnd(rowIndex, e);
+    }
+  }
+
+  rowDragOver = e => {
+    const rowIndex = this.props.index;
+    if (this.props.onRowDragEnd) {
+      this.props.onRowDragOver(rowIndex, e);
+    }
+  }
+
   render() {
     this.clickNum = 0;
     const trCss = {
@@ -86,10 +107,14 @@ class TableRow extends Component {
       (this.props.onRowClick || this.props.onRowDoubleClick)) {
       return (
         <tr { ...trCss }
+            draggable={ this.props.enableDragging }
             onMouseOver={ this.rowMouseOver }
             onMouseOut={ this.rowMouseOut }
             onClick={ this.rowClick }
-            onDoubleClick={ this.rowDoubleClick }>{ this.props.children }</tr>
+            onDoubleClick={ this.rowDoubleClick }
+            onDragStart={ this.rowDragStart }
+            onDragEnd={ this.rowDragEnd }
+            onDragOver={ this.rowDragOver }>{ this.props.children }</tr>
       );
     } else {
       return (
@@ -108,6 +133,10 @@ TableRow.propTypes = {
   onExpandRow: PropTypes.func,
   onRowMouseOut: PropTypes.func,
   onRowMouseOver: PropTypes.func,
+  onRowDragStart: PropTypes.func,
+  onRowDragEnd: PropTypes.func,
+  onRowDragOver: PropTypes.func,
+  enableDragging: PropTypes.bool,
   unselectableRow: PropTypes.bool
 };
 TableRow.defaultProps = {

@@ -247,3 +247,7 @@
 .bounceOut {
   animation-name: bounceOut;
 }
+
+.react-bs-table .drag-placeholder {
+    border: 2px dashed rgb(210, 210, 210);
+}

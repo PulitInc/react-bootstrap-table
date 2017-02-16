@@ -386,7 +386,9 @@ class BootstrapTable extends Component {
             withoutNoDataText={ this.props.options.withoutNoDataText }
             expanding={ this.state.expanding }
             onExpand={ this.handleExpandRow }
-            beforeShowError={ this.props.options.beforeShowError } />
+            beforeShowError={ this.props.options.beforeShowError }
+            enableRowReorder={ this.props.options.rowReorder }
+            onRowReordered={ this.handleRowReorder }/>
         </div>
         { tableFilter }
         { pagination }
@@ -516,6 +518,36 @@ class BootstrapTable extends Component {
   handleRowDoubleClick = row => {
     if (this.props.options.onRowDoubleClick) {
       this.props.options.onRowDoubleClick(row);
+    }
+  }
+
+  handleRowReorder = (from, to) => {
+    if (this.props.options.onRowReordered) {
+      const edit = [];
+      if (from < to) {
+        for (let i = from; i <= to - 1; ++i) {
+          edit.push({
+            oldPosition: i + 1,
+            newPosition: i
+          });
+        }
+        edit.push({
+          oldPosition: from,
+          newPosition: to
+        });
+      } else if (from > to ) {
+        for (let i = to + 1; i <= from; ++i) {
+          edit.push({
+            oldPosition: i - 1,
+            newPosition: i
+          });
+        }
+        edit.push({
+          oldPosition: from,
+          newPosition: to
+        });
+      }
+      this.props.options.onRowReordered(edit);
     }
   }
 
@@ -1224,7 +1256,9 @@ BootstrapTable.propTypes = {
     expandRowBgColor: PropTypes.string,
     expandBy: PropTypes.string,
     expanding: PropTypes.array,
-    beforeShowError: PropTypes.func
+    beforeShowError: PropTypes.func,
+    rowReorder: PropTypes.bool,
+    onRowReordered: PropTypes.func
   }),
   fetchInfo: PropTypes.shape({
     dataTotalSize: PropTypes.number
@@ -1330,7 +1364,9 @@ BootstrapTable.defaultProps = {
     expandRowBgColor: undefined,
     expandBy: Const.EXPAND_BY_ROW,
     expanding: [],
-    beforeShowError: undefined
+    beforeShowError: undefined,
+    rowReorder: false,
+    onRowReordered: undefined
   },
   fetchInfo: {
     dataTotalSize: 0

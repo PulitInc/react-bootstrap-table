@@ -12,11 +12,15 @@ const isFun = function(obj) {
 };
 
 class TableBody extends Component {
+  dragged = null;
+  draggedPlaceholder = null;
   constructor(props) {
     super(props);
     this.state = {
       currEditCell: null
     };
+    this.draggedPlaceholder = document.createElement('tr');
+    this.draggedPlaceholder.className = 'drag-placeholder';
   }
 
   render() {
@@ -127,10 +131,14 @@ class TableBody extends Component {
         index={ r }
         selectRow={ isSelectRowDefined ? this.props.selectRow : undefined }
         enableCellEdit={ cellEdit.mode !== Const.CELL_EDIT_NONE }
+        enableDragging={ this.props.enableRowReorder }
         onRowClick={ this.handleRowClick }
         onRowDoubleClick={ this.handleRowDoubleClick }
         onRowMouseOver={ this.handleRowMouseOver }
         onRowMouseOut={ this.handleRowMouseOut }
+        onRowDragStart={ this.handleRowDragStart }
+        onRowDragEnd={ this.handleRowDragEnd }
+        onRowDragOver={ this.handleRowDragOver }
         onSelectRow={ this.handleSelectRow }
         onExpandRow={ this.handleClickCell }
         unselectableRow={ disable }>
@@ -196,6 +204,54 @@ class TableBody extends Component {
     const { onRowDoubleClick } = this.props;
     const targetRow = this.props.data[rowIndex];
     onRowDoubleClick(targetRow);
+  }
+
+  handleRowDragOver = (rowIndex, e) => {
+    e.preventDefault();
+    let target = e.target;
+    if (this.dragged !== null && (target.nodeName === 'TD' || target.nodeName === 'TR')) {
+      this.dragged.target.style.display = 'none';
+      if (target.nodeName === 'TD') {
+        target = e.target.parentNode;
+      }
+      if (target.className === 'drag-placeholder') return;
+      const placeholder = this.draggedPlaceholder;
+      placeholder.style.height = target.clientHeight + 'px';
+      const nodes = placeholder.childNodes;
+      if (nodes && nodes !== null) {
+        for (let i = nodes.length - 1; i >= 0; --i) {
+          placeholder.removeChild(nodes[i]);
+        }
+      }
+      const tdList = target.childNodes;
+      for (let i = tdList.length - 1; i >= 0; --i) {
+        placeholder.appendChild(document.createElement('td'));
+      }
+      this.dragged.over = rowIndex >= this.dragged.rowIndex ? rowIndex - 1 : rowIndex;
+      target.parentNode.insertBefore(placeholder, target);
+    }
+  }
+
+  handleRowDragStart = (rowIndex, e) => {
+    this.dragged = {
+      rowIndex: rowIndex,
+      target: e.currentTarget
+    };
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.currentTarget);
+  }
+
+  handleRowDragEnd = () => {
+    if (this.dragged !== null) {
+      this.dragged.target.style.display = 'table-row';
+      this.dragged.target.parentNode.removeChild(this.draggedPlaceholder);
+
+      const from = this.dragged.rowIndex;
+      const to = this.dragged.over;
+      if (this.props.onRowReordered) {
+        this.props.onRowReordered(from, to);
+      }
+    }
   }
 
   handleSelectRow = (rowIndex, isSelected, e) => {
@@ -327,8 +383,10 @@ TableBody.propTypes = {
   condensed: PropTypes.bool,
   keyField: PropTypes.string,
   selectedRowKeys: PropTypes.array,
+  enableRowReorder: PropTypes.bool,
   onRowClick: PropTypes.func,
   onRowDoubleClick: PropTypes.func,
+  onRowReordered: PropTypes.func,
   onSelectRow: PropTypes.func,
   noDataText: PropTypes.oneOfType([ PropTypes.string, PropTypes.object ]),
   withoutNoDataText: PropTypes.bool,
