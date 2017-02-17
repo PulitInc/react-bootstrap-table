@@ -14,7 +14,7 @@ const CONST_VAR = {
   CELL_EDIT_NONE: 'none',
   CELL_EDIT_CLICK: 'click',
   CELL_EDIT_DBCLICK: 'dbclick',
-  SIZE_PER_PAGE_LIST: [ 10, 25, 30, 50 ],
+  SIZE_PER_PAGE_LIST: [ 5, 10, 25, 30, 50 ],
   PAGINATION_SIZE: 5,
   NO_DATA_TEXT: 'There is no data to display',
   SHOW_ONLY_SELECT: 'Show Selected Only',

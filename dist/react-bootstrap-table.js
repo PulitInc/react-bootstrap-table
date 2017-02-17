@@ -654,7 +654,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            expanding: this.state.expanding,
 	            onExpand: this.handleExpandRow,
 	            beforeShowError: this.props.options.beforeShowError,
-	            enableRowReorder: this.props.options.rowReorder,
+	            enableRowReorder: this.props.options.rowReorder ? true : false,
 	            onRowReordered: this.handleRowReorder })
 	        ),
 	        tableFilter,
@@ -802,7 +802,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '__handleRowReorder__REACT_HOT_LOADER__',
 	    value: function __handleRowReorder__REACT_HOT_LOADER__(from, to) {
 	      if (this.props.options.onRowReordered) {
+	        var page = this.getCurrentPage();
+	        var startIndex = Math.max(0, page - 1) * this.getSizePerPage();
 	        var edit = [];
+	        from += startIndex;
+	        to += startIndex;
 	        if (from < to) {
 	          for (var i = from; i <= to - 1; ++i) {
 	            edit.push({
@@ -1799,7 +1803,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CELL_EDIT_NONE: 'none',
 	  CELL_EDIT_CLICK: 'click',
 	  CELL_EDIT_DBCLICK: 'dbclick',
-	  SIZE_PER_PAGE_LIST: [10, 25, 30, 50],
+	  SIZE_PER_PAGE_LIST: [5, 10, 25, 30, 50],
 	  PAGINATION_SIZE: 5,
 	  NO_DATA_TEXT: 'There is no data to display',
 	  SHOW_ONLY_SELECT: 'Show Selected Only',

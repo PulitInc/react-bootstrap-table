@@ -387,7 +387,7 @@ class BootstrapTable extends Component {
             expanding={ this.state.expanding }
             onExpand={ this.handleExpandRow }
             beforeShowError={ this.props.options.beforeShowError }
-            enableRowReorder={ this.props.options.rowReorder }
+            enableRowReorder={ this.props.options.rowReorder ? true : false }
             onRowReordered={ this.handleRowReorder }/>
         </div>
         { tableFilter }
@@ -523,7 +523,11 @@ class BootstrapTable extends Component {
 
   handleRowReorder = (from, to) => {
     if (this.props.options.onRowReordered) {
+      const page = this.getCurrentPage();
+      const startIndex = Math.max(0, page - 1) * this.getSizePerPage();
       const edit = [];
+      from += startIndex;
+      to += startIndex;
       if (from < to) {
         for (let i = from; i <= to - 1; ++i) {
           edit.push({
